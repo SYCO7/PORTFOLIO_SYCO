@@ -1,0 +1,15 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="720" fill="#090B12"/>
+  <rect x="40" y="40" width="1200" height="640" rx="20" fill="#0E1220" stroke="#223047"/>
+  <path d="M40 220H1240" stroke="#263449"/>
+  <circle cx="84" cy="132" r="10" fill="#FB7185"/>
+  <circle cx="120" cy="132" r="10" fill="#22D3EE"/>
+  <circle cx="156" cy="132" r="10" fill="#F59E0B"/>
+  <rect x="92" y="282" width="360" height="22" rx="11" fill="#22D3EE" fill-opacity="0.25"/>
+  <rect x="92" y="320" width="620" height="14" rx="7" fill="#334155"/>
+  <rect x="92" y="348" width="520" height="14" rx="7" fill="#334155"/>
+  <rect x="92" y="376" width="420" height="14" rx="7" fill="#334155"/>
+  <rect x="780" y="270" width="392" height="280" rx="14" fill="#0B1220" stroke="#1E293B"/>
+  <path d="M816 504L856 448L900 476L948 404L1000 444L1064 360L1128 402" stroke="#FB7185" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="92" y="188" fill="#E2E8F0" font-family="Arial" font-size="36" font-weight="700">EchoGuard AI</text>
+</svg>

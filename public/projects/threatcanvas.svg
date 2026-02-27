@@ -1,0 +1,11 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="720" fill="#090B12"/>
+  <rect x="54" y="54" width="1172" height="612" rx="20" fill="#0D1220" stroke="#25364D"/>
+  <text x="96" y="146" fill="#E2E8F0" font-family="Arial" font-size="34" font-weight="700">ThreatCanvas</text>
+  <path d="M96 224H1186" stroke="#25364D"/>
+  <rect x="96" y="258" width="280" height="360" rx="14" fill="#111827" stroke="#334155"/>
+  <rect x="402" y="258" width="360" height="160" rx="14" fill="#111827" stroke="#334155"/>
+  <rect x="402" y="458" width="360" height="160" rx="14" fill="#111827" stroke="#334155"/>
+  <rect x="788" y="258" width="398" height="360" rx="14" fill="#111827" stroke="#334155"/>
+  <path d="M836 550L900 480L948 520L1008 430L1072 490L1136 380" stroke="#FB7185" stroke-width="7" stroke-linecap="round"/>
+</svg>

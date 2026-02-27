@@ -1,0 +1,10 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="720" fill="#080910"/>
+  <rect x="52" y="52" width="1176" height="616" rx="20" fill="#0C101A" stroke="#25364A"/>
+  <path d="M52 194H1228" stroke="#25364A"/>
+  <text x="96" y="150" fill="#F8FAFC" font-family="Arial" font-size="34" font-weight="700">ShellSafe Lab</text>
+  <rect x="96" y="250" width="1088" height="366" rx="14" fill="#090D16" stroke="#2B3C51"/>
+  <text x="126" y="304" fill="#22D3EE" font-family="Courier New" font-size="24">analyst@lab:~$ ./scan --target app.local --safe-mode</text>
+  <text x="126" y="356" fill="#FB7185" font-family="Courier New" font-size="22">[warn] payload blocked by command sanitizer</text>
+  <text x="126" y="408" fill="#A3E635" font-family="Courier New" font-size="22">[ok] remediation hints generated</text>
+</svg>

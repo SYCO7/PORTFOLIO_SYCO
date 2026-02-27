@@ -1,0 +1,11 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1280" height="720" fill="#0A0C14"/>
+  <rect x="60" y="60" width="1160" height="600" rx="20" fill="#0E121C" stroke="#2C3A4F"/>
+  <text x="98" y="146" fill="#F8FAFC" font-family="Arial" font-size="34" font-weight="700">OWASP Trail Mapper</text>
+  <path d="M98 220H1182" stroke="#2C3A4F"/>
+  <path d="M160 520C280 420 380 420 480 520C580 620 700 620 820 500C900 420 980 420 1100 520" stroke="#22D3EE" stroke-width="8" stroke-linecap="round"/>
+  <circle cx="160" cy="520" r="14" fill="#22D3EE"/>
+  <circle cx="480" cy="520" r="14" fill="#FB7185"/>
+  <circle cx="820" cy="500" r="14" fill="#FBBF24"/>
+  <circle cx="1100" cy="520" r="14" fill="#22D3EE"/>
+</svg>
