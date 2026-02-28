@@ -1,7 +1,7 @@
 export const navItems = [
   { label: "Home", href: "/" },
   { label: "About", href: "/#about" },
-  { label: "Projects Lab", href: "/projects-lab" },
+  { label: "Red Team Arsenal", href: "/projects-lab" },
   { label: "Profile", href: "/profile" },
 ];
 
@@ -11,7 +11,7 @@ export const profile = {
   subtitle: "Adversarial Security Research & Pentesting",
   linkedinUrl: "https://www.linkedin.com/in/tanmoy-mondal-11070334b/",
   about:
-    "I focus on offensive security assessments across web applications and modern attack surfaces, with workflow depth in reconnaissance, exploitation, and reporting. My current training path emphasizes red-team methodology, adversarial research, and AI-aware security operations.",
+    "I focus on offensive security assessments across web applications and modern attack surfaces, with workflow depth in reconnaissance, exploitation, and reporting. My current training path emphasizes red-team methodology, adversary simulation research, and offensive tooling development.",
 };
 
 export const certifications: Array<{ title: string; issuer: string; year: string }> = [];

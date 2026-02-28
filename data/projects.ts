@@ -1,8 +1,5 @@
 export type ProjectCategory =
   | "Red Team"
-  | "Blue Team"
-  | "AI Security"
-  | "Web Pentest"
   | "Offensive Security";
 export type ProjectStatus = "Prototype" | "Active" | "Research";
 
@@ -44,57 +41,35 @@ export const projectsLabData: ProjectLabItem[] = [
     releaseLabel: "View Release v4.0.0",
   },
   {
-    projectTitle: "EchoGuard AI",
-    shortTagline: "AI-assisted anomaly detection prototype for SOC-style workflows.",
-    githubLink: "https://github.com/username/echoguard",
-    screenshotImage: "/projects/echoguard.svg",
-    techStack: ["Next.js", "TypeScript", "Python"],
-    categoryTag: "AI Security",
-    statusBadge: "Prototype",
-  },
-  {
-    projectTitle: "ReconPulse",
-    shortTagline: "Target-scope recon dashboard for ethical engagement planning.",
-    githubLink: "https://github.com/username/reconpulse",
-    screenshotImage: "/projects/reconpulse.svg",
-    techStack: ["Node.js", "TypeScript", "SQLite"],
-    categoryTag: "Red Team",
-    statusBadge: "Active",
-  },
-  {
-    projectTitle: "BlueLens SIEM Mini",
-    shortTagline: "Detection rule sandbox with timeline-based event triage.",
-    githubLink: "https://github.com/username/bluelens-siem-mini",
-    screenshotImage: "/projects/bluelens.svg",
-    techStack: ["React", "TypeScript", "PostgreSQL"],
-    categoryTag: "Blue Team",
-    statusBadge: "Research",
-  },
-  {
     projectTitle: "OWASP Trail Mapper",
-    shortTagline: "Interactive OWASP practice tracker with remediation notes.",
+    shortTagline: "Web attack-surface mapping utility for structured offensive testing and remediation tracking.",
     githubLink: "https://github.com/username/owasp-trail-mapper",
     screenshotImage: "/projects/owasp-trail.svg",
     techStack: ["Next.js", "Tailwind", "Zod"],
-    categoryTag: "Web Pentest",
+    categoryTag: "Red Team",
     statusBadge: "Active",
-  },
-  {
-    projectTitle: "ThreatCanvas",
-    shortTagline: "MITRE ATT&CK mapping utility for purple-team exercises.",
-    githubLink: "https://github.com/username/threatcanvas",
-    screenshotImage: "/projects/threatcanvas.svg",
-    techStack: ["TypeScript", "D3", "Vite"],
-    categoryTag: "Blue Team",
-    statusBadge: "Prototype",
+    typeTag: "Assessment Tool",
+    languageTag: "TypeScript",
+    keyFeatures: [
+      "Engagement-oriented endpoint mapping with scoped test-note workflows",
+      "Operator-friendly remediation trail support for post-assessment reporting",
+      "Consistent structure for repeatable web penetration testing cycles",
+    ],
   },
   {
     projectTitle: "ShellSafe Lab",
-    shortTagline: "Command injection testing playground for secure coding demos.",
+    shortTagline: "Controlled command-injection validation lab for offensive payload testing and exploit analysis.",
     githubLink: "https://github.com/username/shellsafe-lab",
     screenshotImage: "/projects/shellsafe.svg",
     techStack: ["Node.js", "Express", "Docker"],
-    categoryTag: "Web Pentest",
+    categoryTag: "Offensive Security",
     statusBadge: "Research",
+    typeTag: "Lab Environment",
+    languageTag: "JavaScript",
+    keyFeatures: [
+      "Isolated target surfaces for command injection payload experimentation",
+      "Repeatable exploit scenarios for adversary simulation research",
+      "Containerized local workflow for safe offensive test execution",
+    ],
   },
 ];

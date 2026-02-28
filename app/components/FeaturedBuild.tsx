@@ -23,16 +23,16 @@ export default function FeaturedBuild() {
 
       <article className="glass-panel rounded-2xl border border-border/70 p-5 transition-all duration-300 hover:-translate-y-0.5 hover:border-cyan-400/35">
         <div className="mb-3 flex items-center justify-between gap-3">
-          <h3 className="text-lg font-medium text-slate-100">EchoGuard AI</h3>
+          <h3 className="text-lg font-medium text-slate-100">ReconPulse v4</h3>
           <span className="rounded-full border border-border/80 px-2 py-1 text-[10px] uppercase tracking-wider text-rose-300">
-            Prototype
+            Active
           </span>
         </div>
         <p className="text-sm leading-6 text-slate-300">
-          AI-assisted security monitoring prototype with simulated anomaly scoring.
+          Passive reconnaissance intelligence framework for multi-source domain correlation and operator-ready reporting.
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
-          {['Next.js', 'TypeScript', 'Python'].map((tech) => (
+          {['Python', 'Typer', 'Requests'].map((tech) => (
             <span
               key={tech}
               className="rounded-md border border-border/70 bg-black/45 px-2 py-1 text-[11px] text-slate-300"
@@ -45,7 +45,7 @@ export default function FeaturedBuild() {
           href="/projects-lab"
           className="mt-4 inline-flex rounded-lg border border-border/80 bg-black/30 px-3 py-2 text-xs uppercase tracking-[0.16em] text-slate-200 transition-colors hover:text-cyan-300"
         >
-          View in Projects Lab
+          View in Red Team Arsenal
         </Link>
       </article>
     </motion.section>
