@@ -2,15 +2,18 @@
 
 import { FormEvent, useMemo, useState } from "react";
 
+import emailjs from "@emailjs/browser";
 import { motion } from "framer-motion";
 import { Loader2, Send } from "lucide-react";
+
+const SERVICE_ID = "service_sblgste";
+const TEMPLATE_ID = "template_16f25en";
+const PUBLIC_KEY = "IKCPQqy2LBYPxJQ2o";
 
 const initialForm = {
   name: "",
   email: "",
   message: "",
-  website: "",
-  formStartedAt: Date.now(),
 };
 
 export default function ContactForm() {
@@ -31,20 +34,18 @@ export default function ContactForm() {
     setIsSubmitting(true);
 
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        {
+          name: form.name,
+          email: form.email,
+          message: form.message,
         },
-        body: JSON.stringify(form),
-      });
+        PUBLIC_KEY,
+      );
 
-      if (!response.ok) {
-        const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(payload?.error || "Failed to send message. Please try again.");
-      }
-
-      setForm({ ...initialForm, formStartedAt: Date.now() });
+      setForm(initialForm);
       setSuccess(true);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Failed to send message. Please try again.");
@@ -92,17 +93,6 @@ export default function ContactForm() {
           />
         </label>
 
-        <input
-          type="text"
-          name="website"
-          tabIndex={-1}
-          autoComplete="off"
-          value={form.website}
-          onChange={(event) => setForm((prev) => ({ ...prev, website: event.target.value }))}
-          className="hidden"
-          aria-hidden
-        />
-
         <motion.button
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.985 }}
@@ -114,7 +104,7 @@ export default function ContactForm() {
           {isSubmitting ? "Sending..." : "Send Message"}
         </motion.button>
 
-        {success ? <p className="text-sm text-emerald-300">Your message has been sent successfully.</p> : null}
+        {success ? <p className="text-sm text-emerald-300">Message sent successfully!</p> : null}
         {error ? <p className="text-sm text-rose-300">{error}</p> : null}
       </div>
     </form>
