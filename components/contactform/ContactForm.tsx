@@ -5,6 +5,9 @@ import { FormEvent, useMemo, useState } from "react";
 import emailjs from "@emailjs/browser";
 import { motion } from "framer-motion";
 import { Loader2, Send } from "lucide-react";
+import ReCAPTCHA from "react-google-recaptcha";
+
+const RECAPTCHA_SITE_KEY = "6LcMsYIsAAAAAAfCfC-XRfYi_mMduol629-Oic1F";
 
 const initialForm = {
   name: "",
@@ -17,16 +20,24 @@ export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaRenderKey, setCaptchaRenderKey] = useState(0);
 
   const isDisabled = useMemo(
-    () => isSubmitting || !form.name.trim() || !form.email.trim() || !form.message.trim(),
-    [form.email, form.message, form.name, isSubmitting],
+    () => isSubmitting || !form.name.trim() || !form.email.trim() || !form.message.trim() || !captchaToken,
+    [captchaToken, form.email, form.message, form.name, isSubmitting],
   );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setError(null);
     setSuccess(false);
+
+    if (!captchaToken) {
+      setError("Please verify that you are not a robot.");
+      return;
+    }
+
     setIsSubmitting(true);
 
     const { name, email, message } = form;
@@ -68,6 +79,8 @@ export default function ContactForm() {
       }
 
       setForm(initialForm);
+      setCaptchaToken(null);
+      setCaptchaRenderKey((prev) => prev + 1);
       setSuccess(true);
     } catch {
       setError("Failed to send message.");
@@ -117,6 +130,14 @@ export default function ContactForm() {
             className="rounded-xl border border-cyan-300/20 bg-[#050d20]/90 px-3 py-2 text-slate-100 outline-none transition-all focus:border-cyan-300/60 focus:shadow-[0_0_0_1px_rgba(54,243,255,0.28),0_0_28px_rgba(54,243,255,0.15)]"
           />
         </label>
+
+        <ReCAPTCHA
+          key={captchaRenderKey}
+          sitekey={RECAPTCHA_SITE_KEY}
+          onChange={(token: string | null) => setCaptchaToken(token)}
+          onExpired={() => setCaptchaToken(null)}
+          theme="dark"
+        />
 
         <motion.button
           whileHover={{ y: -2 }}
