@@ -17,6 +17,7 @@ const initialForm = {
 
 export default function ContactForm() {
   const [form, setForm] = useState(initialForm);
+  const [honeypot, setHoneypot] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -32,6 +33,10 @@ export default function ContactForm() {
     event.preventDefault();
     setError(null);
     setSuccess(false);
+
+    if (honeypot) {
+      return;
+    }
 
     if (!captchaToken) {
       setError("Please verify that you are not a robot.");
@@ -52,6 +57,8 @@ export default function ContactForm() {
           name,
           email,
           message,
+          website: honeypot,
+          company: honeypot,
           // Satisfy server-side anti-bot timing checks for human submissions.
           formStartedAt: Date.now() - 10_000,
         }),
@@ -79,6 +86,7 @@ export default function ContactForm() {
       }
 
       setForm(initialForm);
+      setHoneypot("");
       setCaptchaToken(null);
       setCaptchaRenderKey((prev) => prev + 1);
       setSuccess(true);
@@ -92,6 +100,17 @@ export default function ContactForm() {
   return (
     <form onSubmit={handleSubmit} className="section-shell rounded-2xl p-5">
       <div className="grid gap-4">
+        <input
+          type="text"
+          name="company"
+          value={honeypot}
+          onChange={(event) => setHoneypot(event.target.value)}
+          style={{ display: "none" }}
+          tabIndex={-1}
+          autoComplete="off"
+          aria-hidden="true"
+        />
+
         <label className="grid gap-2 text-sm text-slate-300">
           Name
           <input
