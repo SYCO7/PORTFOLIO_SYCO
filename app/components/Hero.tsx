@@ -188,7 +188,7 @@ export default function Hero() {
         >
           <div className="relative overflow-hidden rounded-2xl border border-cyan-300/30 bg-black/20">
             <Image
-              src="/profile-photo.png"
+              src="/profile-photo.svg"
               alt="Portrait of Tanmoy Mondal"
               width={520}
               height={620}

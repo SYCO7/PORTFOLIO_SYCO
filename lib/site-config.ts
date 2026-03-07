@@ -1,18 +1,4 @@
-const fallbackUrl = "https://portfolio-syco.vercel.app";
-
-function normalizeSiteUrl(rawUrl?: string) {
-  if (!rawUrl) {
-    return fallbackUrl;
-  }
-
-  const withProtocol = rawUrl.startsWith("http") ? rawUrl : `https://${rawUrl}`;
-
-  try {
-    return new URL(withProtocol).origin;
-  } catch {
-    return fallbackUrl;
-  }
-}
+const siteUrl = "https://cybersyco.vercel.app";
 
 export const siteConfig = {
   name: "Tanmoy Mondal | Cybersecurity Portfolio",
@@ -34,5 +20,5 @@ export const siteConfig = {
   ],
   author: "Tanmoy Mondal",
   githubUrl: "https://github.com/SYCO7",
-  siteUrl: normalizeSiteUrl(process.env.NEXT_PUBLIC_SITE_URL ?? process.env.VERCEL_PROJECT_PRODUCTION_URL),
+  siteUrl,
 };
