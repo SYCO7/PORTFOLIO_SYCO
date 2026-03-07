@@ -2,11 +2,14 @@
 @import "../styles/cyber.css";
 
 :root {
-  --background: #060608;
-  --foreground: #eceef4;
-  --panel: rgba(20, 20, 24, 0.74);
-  --border: rgba(251, 113, 133, 0.22);
-  --glow: #fb7185;
+  --background: #04070f;
+  --foreground: #e8f1ff;
+  --panel: rgba(13, 18, 33, 0.66);
+  --border: rgba(93, 170, 255, 0.26);
+  --glow: #36f3ff;
+  --neon-blue: #36f3ff;
+  --neon-green: #58ff9a;
+  --neon-purple: #b172ff;
 }
 
 @theme inline {
@@ -15,16 +18,131 @@
   --color-panel: var(--panel);
   --color-border: var(--border);
   --color-glow: var(--glow);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-space-grotesk);
+  --font-mono: var(--font-jetbrains-mono);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
-  background: var(--background);
+  background:
+    radial-gradient(circle at 12% 10%, rgba(54, 243, 255, 0.13), transparent 35%),
+    radial-gradient(circle at 84% 6%, rgba(88, 255, 154, 0.12), transparent 32%),
+    radial-gradient(circle at 90% 72%, rgba(177, 114, 255, 0.14), transparent 40%),
+    var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-space-grotesk), Arial, Helvetica, sans-serif;
 }
 
 * {
   border-color: var(--border);
+}
+
+*::selection {
+  background: rgba(88, 255, 154, 0.28);
+  color: #f5fffb;
+}
+
+.section-shell {
+  border: 1px solid rgba(124, 176, 255, 0.2);
+  background: linear-gradient(160deg, rgba(11, 15, 29, 0.72), rgba(5, 8, 19, 0.8));
+  backdrop-filter: blur(18px);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03), 0 18px 55px rgba(0, 0, 0, 0.42);
+}
+
+.neon-ring {
+  box-shadow:
+    0 0 0 1px rgba(54, 243, 255, 0.18),
+    0 0 26px rgba(54, 243, 255, 0.18),
+    0 0 45px rgba(177, 114, 255, 0.12);
+}
+
+.grid-veil {
+  background-image:
+    linear-gradient(to right, rgba(125, 148, 187, 0.08) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(125, 148, 187, 0.08) 1px, transparent 1px);
+  background-size: 42px 42px;
+}
+
+.animated-grid-bg {
+  background-image:
+    linear-gradient(to right, rgba(84, 219, 255, 0.16) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(84, 219, 255, 0.14) 1px, transparent 1px);
+  background-size: 36px 36px;
+  animation: drift-grid 14s linear infinite;
+}
+
+.scanline::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -14%;
+  height: 12%;
+  background: linear-gradient(to bottom, transparent, rgba(54, 243, 255, 0.1), transparent);
+  animation: scanline 4.4s linear infinite;
+  pointer-events: none;
+}
+
+.flicker-text {
+  animation: neon-flicker 3.6s linear infinite;
+}
+
+.neon-hover {
+  transition:
+    box-shadow 0.26s ease,
+    transform 0.26s ease,
+    border-color 0.26s ease;
+}
+
+.neon-hover:hover {
+  transform: translateY(-2px);
+  border-color: rgba(84, 219, 255, 0.48);
+  box-shadow:
+    0 0 0 1px rgba(84, 219, 255, 0.2),
+    0 0 32px rgba(84, 219, 255, 0.16),
+    0 20px 36px rgba(0, 0, 0, 0.35);
+}
+
+@keyframes drift-grid {
+  0% {
+    transform: translate3d(0, 0, 0);
+  }
+  100% {
+    transform: translate3d(0, 36px, 0);
+  }
+}
+
+@keyframes scanline {
+  0% {
+    transform: translateY(0%);
+    opacity: 0;
+  }
+  16% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(920%);
+    opacity: 0;
+  }
+}
+
+@keyframes neon-flicker {
+  0%,
+  18%,
+  22%,
+  62%,
+  64%,
+  100% {
+    text-shadow:
+      0 0 7px rgba(84, 219, 255, 0.9),
+      0 0 24px rgba(84, 219, 255, 0.55),
+      0 0 38px rgba(177, 114, 255, 0.4);
+  }
+  20%,
+  63% {
+    text-shadow: none;
+  }
 }

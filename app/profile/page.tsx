@@ -12,7 +12,7 @@ export default function ProfilePage() {
   return (
     <div className="relative min-h-screen overflow-hidden">
       <div className="pointer-events-none absolute inset-0 z-0 bg-[radial-gradient(circle_at_top,rgba(34,211,238,0.08),transparent_42%),radial-gradient(circle_at_bottom,rgba(251,113,133,0.12),transparent_50%)]" />
-      <div className="pointer-events-none absolute inset-0 z-0 [background-image:linear-gradient(to_right,rgba(251,113,133,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(251,113,133,0.08)_1px,transparent_1px)] [background-size:44px_44px]" />
+      <div className="pointer-events-none absolute inset-0 z-0 bg-[linear-gradient(to_right,rgba(251,113,133,0.08)_1px,transparent_1px),linear-gradient(to_bottom,rgba(251,113,133,0.08)_1px,transparent_1px)] bg-size-[44px_44px]" />
 
       <Navbar />
 

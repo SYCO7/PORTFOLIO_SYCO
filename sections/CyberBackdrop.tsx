@@ -39,7 +39,7 @@ function ParticleField() {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[particles, 3]} />
       </bufferGeometry>
-      <pointsMaterial color="#fb7185" size={0.035} transparent opacity={0.38} sizeAttenuation />
+      <pointsMaterial color="#58ff9a" size={0.035} transparent opacity={0.38} sizeAttenuation />
     </points>
   );
 }
@@ -58,7 +58,7 @@ function GridPlane() {
   return (
     <gridHelper
       ref={grid}
-      args={[34, 34, "#fb7185", "#220f16"]}
+      args={[34, 34, "#36f3ff", "#122239"]}
       position={[0, -3.2, 0]}
       rotation={[0.24, 0, 0]}
     />
@@ -70,7 +70,7 @@ export default function CyberBackdrop() {
     <div className="pointer-events-none fixed inset-0 z-0 opacity-85">
       <Canvas dpr={[1, 1.5]} camera={{ position: [0, 0, 9], fov: 62 }} gl={{ antialias: false }}>
         <ambientLight intensity={0.2} />
-        <directionalLight position={[4, 6, 3]} intensity={0.3} color="#fb7185" />
+        <directionalLight position={[4, 6, 3]} intensity={0.3} color="#36f3ff" />
         <ParticleField />
         <GridPlane />
       </Canvas>

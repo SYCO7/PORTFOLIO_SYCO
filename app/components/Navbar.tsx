@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 
 import { AnimatePresence, motion } from "framer-motion";
 import { Menu, Shield, X } from "lucide-react";
@@ -12,11 +11,7 @@ import { navItems, profile } from "@/lib/portfolio-data";
 
 export default function Navbar() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    setIsMobileMenuOpen(false);
-  }, [pathname]);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -40,23 +35,44 @@ export default function Navbar() {
     };
   }, [isMobileMenuOpen]);
 
+  useEffect(() => {
+    function onScroll() {
+      setIsScrolled(window.scrollY > 20);
+    }
+
+    window.addEventListener("scroll", onScroll, { passive: true });
+
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, []);
+
   function closeMobileMenu() {
     setIsMobileMenuOpen(false);
   }
 
   return (
     <>
-      <header className="fixed inset-x-0 top-0 z-40 border-b border-border/70 bg-background/75 backdrop-blur-xl">
-        <nav className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-6 md:px-10">
-          <Link href="/" className="flex items-center gap-2 text-sm tracking-[0.14em] text-rose-300">
+      <header
+        className={`fixed inset-x-0 top-0 z-40 border-b transition-all duration-300 ${
+          isScrolled
+            ? "border-cyan-300/20 bg-[#050914]/85 shadow-[0_10px_36px_rgba(0,0,0,0.42)] backdrop-blur-xl"
+            : "border-transparent bg-transparent"
+        }`}
+      >
+        <nav className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-6 md:px-10">
+          <Link href="/#home" className="flex items-center gap-2 text-sm tracking-[0.14em] text-cyan-200">
             <Shield className="h-4 w-4" />
-            <span>{profile.name}</span>
+            <span className="font-medium">{profile.name}</span>
           </Link>
 
-          <ul className="hidden items-center gap-6 text-xs uppercase tracking-[0.14em] text-slate-300 md:flex">
+          <ul className="hidden items-center gap-5 text-[11px] uppercase tracking-[0.15em] text-slate-300 md:flex">
             {navItems.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className="transition-colors hover:text-rose-300">
+                <Link
+                  href={item.href}
+                  className="rounded-full px-2 py-1 transition-colors hover:text-cyan-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60"
+                >
                   {item.label}
                 </Link>
               </li>
@@ -69,7 +85,7 @@ export default function Navbar() {
             aria-expanded={isMobileMenuOpen}
             aria-controls="mobile-nav"
             onClick={() => setIsMobileMenuOpen((previous) => !previous)}
-            className="inline-flex items-center justify-center rounded-md border border-border/70 bg-black/35 p-2 text-slate-200 transition-colors hover:text-rose-300 md:hidden"
+            className="inline-flex items-center justify-center rounded-md border border-cyan-300/25 bg-[#060c1d]/70 p-2 text-slate-100 transition-colors hover:text-cyan-300 md:hidden"
           >
             {isMobileMenuOpen ? <X className="h-4 w-4" /> : <Menu className="h-4 w-4" />}
           </button>
@@ -87,7 +103,7 @@ export default function Navbar() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed inset-x-0 top-16 z-30 h-[calc(100dvh-4rem)] bg-black/55 md:hidden"
+              className="fixed inset-x-0 top-16 z-30 h-[calc(100dvh-4rem)] bg-black/60 md:hidden"
             />
 
             <motion.div
@@ -96,7 +112,7 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -12 }}
               transition={{ duration: 0.2, ease: "easeOut" }}
-              className="fixed inset-x-0 top-16 z-40 border-b border-border/70 bg-background/95 px-6 py-4 backdrop-blur-xl md:hidden"
+              className="fixed inset-x-0 top-16 z-40 border-b border-cyan-400/20 bg-[#050a18]/95 px-6 py-4 backdrop-blur-xl md:hidden"
             >
               <ul className="flex flex-col gap-3 text-xs uppercase tracking-[0.14em] text-slate-300">
                 {navItems.map((item) => (
@@ -104,7 +120,7 @@ export default function Navbar() {
                     <Link
                       href={item.href}
                       onClick={closeMobileMenu}
-                      className="block rounded-md border border-border/60 bg-black/35 px-3 py-2 transition-colors hover:text-rose-300"
+                      className="block rounded-md border border-cyan-300/20 bg-[#091126]/80 px-3 py-2 transition-colors hover:text-cyan-300"
                     >
                       {item.label}
                     </Link>
