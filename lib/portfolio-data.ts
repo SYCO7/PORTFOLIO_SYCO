@@ -1,11 +1,8 @@
 export const navItems = [
-  { label: "Home", href: "/#home" },
-  { label: "About", href: "/#about" },
-  { label: "Skills", href: "/#skills" },
-  { label: "Tools", href: "/#tools" },
-  { label: "Projects", href: "/#projects" },
-  { label: "Journey", href: "/#journey" },
-  { label: "Contact", href: "/#contact" },
+  { label: "Home", href: "/" },
+  { label: "About", href: "/about" },
+  { label: "Projects", href: "/projects" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export const profile = {
@@ -111,7 +108,7 @@ export const featuredProjects = [
     demo: "#",
   },
   {
-    title: "Vulnerability Scanner",
+    title: "Web Vulnerability Scanner",
     description:
       "A modular scanner prototype for baseline web checks and initial vulnerability triage in controlled environments.",
     image: "/projects/owasp-trail.svg",

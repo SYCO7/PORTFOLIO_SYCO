@@ -1,27 +1,31 @@
-# Tanmoy Mondal — Cybersecurity Portfolio
+# Tanmoy Mondal - Multi-Page Cybersecurity Portfolio
 
-Minimal futuristic portfolio for Tanmoy Mondal, positioned as an aspiring cybersecurity professional focused on ethical hacking, penetration testing, AI security learning, and CTF growth.
+Professional multi-page portfolio built with Next.js App Router.
 
-## Project Overview
+## Pages
 
-This portfolio is intentionally realistic and student-focused:
+- `/` Home
+- `/about` About
+- `/projects` Projects
+- `/contact` Contact
 
-- Clean dark red-team aesthetic (matte black + subtle neon accents)
-- Smooth section transitions with Framer Motion
-- Glassmorphism cards with restrained visual effects
-- One real project: EchoGuard AI (prototype)
-- Certifications timeline that only renders verified entries
+All pages share a consistent cybersecurity UI with:
+
+- Animated navbar/footer
+- Dark neon-themed visual style
+- Framer Motion transitions
+- Responsive layouts
+- Particle-style cyber backdrop
 
 ## Tech Stack
 
-- Next.js (App Router) + TypeScript
+- Next.js 16 (App Router) + TypeScript
 - Tailwind CSS v4
 - Framer Motion
-- Three.js + React Three Fiber (subtle background)
+- Nodemailer (contact email API)
 - Lucide React icons
-- ESLint + Prettier
 
-## Run Locally
+## Local Development
 
 ```bash
 npm install
@@ -30,28 +34,43 @@ npm run dev
 
 Open `http://localhost:3000`.
 
-## Update Real Profile Data (Single Source)
+## Email Setup (Contact Form)
 
-Edit all profile-facing content from one file:
+The contact form posts to `POST /api/contact` and sends email via SMTP.
+
+Configure these environment variables in `.env.local`:
+
+```env
+NEXT_PUBLIC_SITE_URL=https://cybersyco.vercel.app
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=587
+SMTP_SECURE=false
+SMTP_USER=your-smtp-user@example.com
+SMTP_PASS=your-smtp-password
+CONTACT_TO=tanmoymondaltanmoy94@gmail.com
+CONTACT_FROM="Portfolio Contact <your-smtp-user@example.com>"
+```
+
+On successful form submit, users see:
+
+`Your message has been sent successfully.`
+
+## Content Sources
+
+Main profile/project data:
 
 - `lib/portfolio-data.ts`
 
-Inside this file you can update:
+Core page/UI components:
 
-- `profile` (name, title, subtitle, LinkedIn URL, about text)
-- `projects` (currently EchoGuard AI only)
-- `certifications` (verified credentials only, max 5 shown)
-- `skillColumns`
+- `components/navbar`
+- `components/footer`
+- `components/projectcard`
+- `components/contactform`
+- `components/layout`
 
-To add real certifications, append entries to `certifications` in this shape:
+## Build
 
-```ts
-{ title: "Certification Name", issuer: "Issuer", year: "2026" }
+```bash
+npm run build
 ```
-
-## Deployment (Vercel)
-
-1. Push repository to GitHub.
-2. Import project into Vercel.
-3. Build command: `npm run build`
-4. Deploy.
