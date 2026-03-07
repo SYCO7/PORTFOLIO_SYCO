@@ -188,12 +188,12 @@ export default function Hero() {
         >
           <div className="relative overflow-hidden rounded-2xl border border-cyan-300/30 bg-black/20">
             <Image
-              src="/profile-photo.svg"
+              src="/profile-photo.png"
               alt="Portrait of Tanmoy Mondal"
               width={520}
               height={620}
               priority
-              className="h-auto w-full"
+              className="h-[26rem] w-full object-cover object-[58%_18%]"
             />
             <div className="pointer-events-none absolute inset-0 bg-linear-to-t from-[#030711]/65 via-transparent to-transparent" />
           </div>
