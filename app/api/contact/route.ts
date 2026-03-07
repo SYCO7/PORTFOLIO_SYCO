@@ -12,6 +12,10 @@ type ContactPayload = {
   formStartedAt?: number;
 };
 
+const EMAILJS_SERVICE_ID = "service_sblgste";
+const EMAILJS_TEMPLATE_ID = "template_16f25en";
+const EMAILJS_PUBLIC_KEY = "IKCPQqy2LBYPxJQ2o";
+
 type RateEntry = {
   count: number;
   resetAt: number;
@@ -90,6 +94,27 @@ function checkRateLimit(ip: string) {
   return { allowed: true as const, remaining: Math.max(0, maxRequests - entry.count) };
 }
 
+async function sendViaEmailJs(payload: { name: string; email: string; message: string }) {
+  const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      service_id: EMAILJS_SERVICE_ID,
+      template_id: EMAILJS_TEMPLATE_ID,
+      user_id: EMAILJS_PUBLIC_KEY,
+      template_params: {
+        name: payload.name,
+        email: payload.email,
+        message: payload.message,
+      },
+    }),
+  });
+
+  return response.ok;
+}
+
 export async function POST(request: Request) {
   let payload: ContactPayload;
 
@@ -152,10 +177,12 @@ export async function POST(request: Request) {
   const smtpSecure = process.env.SMTP_SECURE === "true";
 
   if (!smtpHost || !smtpUser || !smtpPass) {
-    return NextResponse.json(
-      { error: "Email service is not configured yet. Please try again later." },
-      { status: 500 },
-    );
+    const emailJsSent = await sendViaEmailJs({ name, email, message });
+    if (emailJsSent) {
+      return NextResponse.json({ success: true });
+    }
+
+    return NextResponse.json({ error: "Failed to send email. Please try again." }, { status: 500 });
   }
 
   const transporter = nodemailer.createTransport({
@@ -191,6 +218,11 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch {
+    const emailJsSent = await sendViaEmailJs({ name, email, message });
+    if (emailJsSent) {
+      return NextResponse.json({ success: true });
+    }
+
     return NextResponse.json({ error: "Failed to send email. Please try again." }, { status: 500 });
   }
 }

@@ -6,7 +6,7 @@ const contentSecurityPolicy = `
   style-src 'self' 'unsafe-inline';
   img-src 'self' data: blob: https:;
   font-src 'self' data:;
-  connect-src 'self' https://api.github.com https://*.github.com;
+  connect-src 'self' https://api.github.com https://*.github.com https://api.emailjs.com;
   frame-ancestors 'none';
   base-uri 'self';
   form-action 'self';
