@@ -9,6 +9,8 @@ const initialForm = {
   name: "",
   email: "",
   message: "",
+  website: "",
+  formStartedAt: Date.now(),
 };
 
 export default function ContactForm() {
@@ -42,7 +44,7 @@ export default function ContactForm() {
         throw new Error(payload?.error || "Failed to send message. Please try again.");
       }
 
-      setForm(initialForm);
+      setForm({ ...initialForm, formStartedAt: Date.now() });
       setSuccess(true);
     } catch (submitError) {
       setError(submitError instanceof Error ? submitError.message : "Failed to send message. Please try again.");
@@ -89,6 +91,17 @@ export default function ContactForm() {
             className="rounded-xl border border-cyan-300/20 bg-[#050d20]/90 px-3 py-2 text-slate-100 outline-none transition-all focus:border-cyan-300/60 focus:shadow-[0_0_0_1px_rgba(54,243,255,0.28),0_0_28px_rgba(54,243,255,0.15)]"
           />
         </label>
+
+        <input
+          type="text"
+          name="website"
+          tabIndex={-1}
+          autoComplete="off"
+          value={form.website}
+          onChange={(event) => setForm((prev) => ({ ...prev, website: event.target.value }))}
+          className="hidden"
+          aria-hidden
+        />
 
         <motion.button
           whileHover={{ y: -2 }}
