@@ -2,12 +2,8 @@
 
 import { FormEvent, useMemo, useState } from "react";
 
-import emailjs from "@emailjs/browser";
 import { motion } from "framer-motion";
 import { Loader2, Send } from "lucide-react";
-import ReCAPTCHA from "react-google-recaptcha";
-
-const RECAPTCHA_SITE_KEY = "6LcMsYIsAAAAAAfCfC-XRfYi_mMduol629-Oic1F";
 
 const initialForm = {
   name: "",
@@ -15,39 +11,45 @@ const initialForm = {
   message: "",
 };
 
+const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function ContactForm() {
   const [form, setForm] = useState(initialForm);
   const [honeypot, setHoneypot] = useState("");
+  const [formStartedAt, setFormStartedAt] = useState<number>(() => Date.now());
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [success, setSuccess] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
-  const [captchaRenderKey, setCaptchaRenderKey] = useState(0);
+  const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
   const isDisabled = useMemo(
-    () => isSubmitting || !form.name.trim() || !form.email.trim() || !form.message.trim() || !captchaToken,
-    [captchaToken, form.email, form.message, form.name, isSubmitting],
+    () => isSubmitting || !form.name.trim() || !form.email.trim() || !form.message.trim(),
+    [form.email, form.message, form.name, isSubmitting],
   );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setError(null);
-    setSuccess(false);
+    setStatus(null);
 
     if (honeypot) {
       return;
     }
 
-    if (!captchaToken) {
-      setError("Please verify that you are not a robot.");
+    const name = form.name.trim();
+    const email = form.email.trim();
+    const message = form.message.trim();
+
+    if (!name || !email || !message) {
+      setStatus({ type: "error", message: "Name, email, and message are required." });
+      return;
+    }
+
+    if (!emailPattern.test(email)) {
+      setStatus({ type: "error", message: "Please enter a valid email address." });
       return;
     }
 
     setIsSubmitting(true);
 
-    const { name, email, message } = form;
-
-    async function sendViaApiFallback() {
+    try {
       const response = await fetch("/api/contact", {
         method: "POST",
         headers: {
@@ -58,51 +60,33 @@ export default function ContactForm() {
           email,
           message,
           website: honeypot,
-          company: honeypot,
-          // Satisfy server-side anti-bot timing checks for human submissions.
-          formStartedAt: Date.now() - 10_000,
+          formStartedAt,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("API fallback failed");
-      }
-    }
-
-    try {
-      try {
-        await emailjs.send(
-          "service_sblgste",
-          "template_16f25en",
-          {
-            name: name,
-            email: email,
-            message: message,
-          },
-          "IKCPQqy2LBYPxJQ2o",
-        );
-      } catch {
-        await sendViaApiFallback();
+        const data = (await response.json().catch(() => null)) as { error?: string } | null;
+        throw new Error(data?.error || "Failed to send message. Please try again.");
       }
 
       setForm(initialForm);
       setHoneypot("");
-      setCaptchaToken(null);
-      setCaptchaRenderKey((prev) => prev + 1);
-      setSuccess(true);
-    } catch {
-      setError("Failed to send message.");
+      setFormStartedAt(Date.now());
+      setStatus({ type: "success", message: "Message sent successfully. I will get back to you soon." });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Failed to send message. Please try again.";
+      setStatus({ type: "error", message });
     } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="section-shell rounded-2xl p-5">
+    <form onSubmit={handleSubmit} className="section-shell rounded-2xl p-5" noValidate>
       <div className="grid gap-4">
         <input
           type="text"
-          name="company"
+          name="website"
           value={honeypot}
           onChange={(event) => setHoneypot(event.target.value)}
           style={{ display: "none" }}
@@ -150,27 +134,29 @@ export default function ContactForm() {
           />
         </label>
 
-        <ReCAPTCHA
-          key={captchaRenderKey}
-          sitekey={RECAPTCHA_SITE_KEY}
-          onChange={(token: string | null) => setCaptchaToken(token)}
-          onExpired={() => setCaptchaToken(null)}
-          theme="dark"
-        />
-
         <motion.button
           whileHover={{ y: -2 }}
           whileTap={{ scale: 0.985 }}
           disabled={isDisabled}
           type="submit"
+          aria-busy={isSubmitting}
           className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-300/45 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-100 transition-all hover:bg-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           {isSubmitting ? "Sending..." : "Send Message"}
         </motion.button>
 
-        {success ? <p className="text-sm text-emerald-300">Message sent successfully!</p> : null}
-        {error ? <p className="text-sm text-rose-300">{error}</p> : null}
+        {status?.type === "success" ? (
+          <p role="status" className="rounded-lg border border-emerald-300/20 bg-emerald-400/10 px-3 py-2 text-sm text-emerald-300">
+            {status.message}
+          </p>
+        ) : null}
+
+        {status?.type === "error" ? (
+          <p role="alert" className="rounded-lg border border-rose-300/20 bg-rose-400/10 px-3 py-2 text-sm text-rose-300">
+            {status.message}
+          </p>
+        ) : null}
       </div>
     </form>
   );

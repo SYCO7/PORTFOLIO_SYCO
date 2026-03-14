@@ -36,7 +36,12 @@ Open `http://localhost:3000`.
 
 ## Email Setup (Contact Form)
 
-The contact form posts to `POST /api/contact` and sends email via SMTP.
+The contact form posts to `POST /api/contact` using `fetch` from the frontend.
+
+Backend delivery priority:
+
+1. SMTP (`SMTP_*` variables)
+2. Resend fallback (`RESEND_API_KEY`)
 
 Configure these environment variables in `.env.local`:
 
@@ -47,6 +52,8 @@ SMTP_PORT=587
 SMTP_SECURE=false
 SMTP_USER=your-smtp-user@example.com
 SMTP_PASS=your-smtp-password
+RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxx
+RESEND_FROM="Portfolio Contact <onboarding@resend.dev>"
 CONTACT_TO=tanmoymondaltanmoy94@gmail.com
 CONTACT_FROM="Portfolio Contact <your-smtp-user@example.com>"
 ```
@@ -67,6 +74,8 @@ On successful form submit, users see:
 	- `SMTP_PASS`
 	- `CONTACT_TO`
 	- `CONTACT_FROM`
+	- `RESEND_API_KEY` (optional but recommended fallback)
+	- `RESEND_FROM` (optional sender for Resend)
 4. Add optional anti-spam controls:
 	- `CONTACT_RATE_LIMIT_WINDOW_MS` (example: `600000`)
 	- `CONTACT_RATE_LIMIT_MAX` (example: `5`)
@@ -97,6 +106,13 @@ The backend now includes:
 - Honeypot field blocking (`website`)
 - Minimum form fill time check
 - Per-IP rate limiting with `429` responses for bursts
+
+### Frontend Form Behavior
+
+- Prevents default browser refresh on submit
+- Client-side validation for empty fields and email format
+- Loading state with disabled submit button while sending
+- Inline success/error alerts based on API response
 
 ## Content Sources
 

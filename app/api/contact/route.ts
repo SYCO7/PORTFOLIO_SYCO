@@ -4,6 +4,8 @@ import nodemailer from "nodemailer";
 
 import { profile } from "@/lib/portfolio-data";
 
+export const runtime = "nodejs";
+
 type ContactPayload = {
   name?: string;
   email?: string;
@@ -11,10 +13,6 @@ type ContactPayload = {
   website?: string;
   formStartedAt?: number;
 };
-
-const EMAILJS_SERVICE_ID = "service_sblgste";
-const EMAILJS_TEMPLATE_ID = "template_16f25en";
-const EMAILJS_PUBLIC_KEY = "IKCPQqy2LBYPxJQ2o";
 
 type RateEntry = {
   count: number;
@@ -94,21 +92,32 @@ function checkRateLimit(ip: string) {
   return { allowed: true as const, remaining: Math.max(0, maxRequests - entry.count) };
 }
 
-async function sendViaEmailJs(payload: { name: string; email: string; message: string }) {
-  const response = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+async function sendViaResend(payload: {
+  name: string;
+  email: string;
+  message: string;
+  destination: string;
+  replyTo: string;
+}) {
+  const apiKey = process.env.RESEND_API_KEY;
+  if (!apiKey) {
+    return false;
+  }
+
+  const from = process.env.RESEND_FROM || process.env.CONTACT_FROM || "Portfolio Contact <onboarding@resend.dev>";
+
+  const response = await fetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      service_id: EMAILJS_SERVICE_ID,
-      template_id: EMAILJS_TEMPLATE_ID,
-      user_id: EMAILJS_PUBLIC_KEY,
-      template_params: {
-        name: payload.name,
-        email: payload.email,
-        message: payload.message,
-      },
+      from,
+      to: [payload.destination],
+      reply_to: payload.replyTo,
+      subject: `Portfolio Contact | ${payload.name}`,
+      text: `Sender Name: ${payload.name}\nSender Email: ${payload.email}\n\nMessage:\n${payload.message}`,
     }),
   });
 
@@ -175,14 +184,25 @@ export async function POST(request: Request) {
   const smtpUser = process.env.SMTP_USER;
   const smtpPass = process.env.SMTP_PASS;
   const smtpSecure = process.env.SMTP_SECURE === "true";
+  const destination = process.env.CONTACT_TO || profile.email;
 
   if (!smtpHost || !smtpUser || !smtpPass) {
-    const emailJsSent = await sendViaEmailJs({ name, email, message });
-    if (emailJsSent) {
+    const resendSent = await sendViaResend({
+      name,
+      email,
+      message,
+      destination,
+      replyTo: email,
+    });
+
+    if (resendSent) {
       return NextResponse.json({ success: true });
     }
 
-    return NextResponse.json({ error: "Failed to send email. Please try again." }, { status: 500 });
+    return NextResponse.json(
+      { error: "Contact service is not configured. Please try again later." },
+      { status: 500 },
+    );
   }
 
   const transporter = nodemailer.createTransport({
@@ -194,8 +214,6 @@ export async function POST(request: Request) {
       pass: smtpPass,
     },
   });
-
-  const destination = process.env.CONTACT_TO || profile.email;
 
   const safeName = escapeHtml(name);
   const safeEmail = escapeHtml(email);
@@ -218,8 +236,15 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true });
   } catch {
-    const emailJsSent = await sendViaEmailJs({ name, email, message });
-    if (emailJsSent) {
+    const resendSent = await sendViaResend({
+      name,
+      email,
+      message,
+      destination,
+      replyTo: email,
+    });
+
+    if (resendSent) {
       return NextResponse.json({ success: true });
     }
 
