@@ -36,7 +36,7 @@ Open `http://localhost:3000`.
 
 ## Email Setup (Contact Form)
 
-The contact form posts to `POST /api/contact` using `fetch` from the frontend.
+The contact form uses EmailJS from the frontend and falls back to `POST /api/contact` if EmailJS is unavailable or fails.
 
 Backend delivery priority:
 
@@ -47,6 +47,9 @@ Configure these environment variables in `.env.local`:
 
 ```env
 NEXT_PUBLIC_SITE_URL=https://cybersyco.vercel.app
+NEXT_PUBLIC_EMAILJS_SERVICE_ID=service_xxxxxxx
+NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=template_xxxxxxx
+NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=xxxxxxxxxxxxxxxx
 SMTP_HOST=smtp.gmail.com
 SMTP_PORT=587
 SMTP_SECURE=false
@@ -67,6 +70,9 @@ On successful form submit, users see:
 1. Open your Vercel project dashboard.
 2. Go to `Settings` -> `Environment Variables`.
 3. Add these variables for `Production` (and `Preview` if needed):
+	- `NEXT_PUBLIC_EMAILJS_SERVICE_ID`
+	- `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID`
+	- `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`
 	- `SMTP_HOST`
 	- `SMTP_PORT`
 	- `SMTP_SECURE`
@@ -113,6 +119,7 @@ The backend now includes:
 - Client-side validation for empty fields and email format
 - Loading state with disabled submit button while sending
 - Inline success/error alerts based on API response
+- Console logging for submit events and provider fallback diagnostics
 
 ## Content Sources
 

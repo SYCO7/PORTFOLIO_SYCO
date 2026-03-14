@@ -2,6 +2,7 @@
 
 import { FormEvent, useMemo, useState } from "react";
 
+import emailjs from "@emailjs/browser";
 import { motion } from "framer-motion";
 import { Loader2, Send } from "lucide-react";
 
@@ -13,6 +14,10 @@ const initialForm = {
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+const EMAILJS_SERVICE_ID = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID ?? "";
+const EMAILJS_TEMPLATE_ID = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID ?? "";
+const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? "";
+
 export default function ContactForm() {
   const [form, setForm] = useState(initialForm);
   const [honeypot, setHoneypot] = useState("");
@@ -20,16 +25,41 @@ export default function ContactForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  const isDisabled = useMemo(
-    () => isSubmitting || !form.name.trim() || !form.email.trim() || !form.message.trim(),
-    [form.email, form.message, form.name, isSubmitting],
+  const hasEmailJsConfig = useMemo(
+    () => Boolean(EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY),
+    [],
   );
+
+  const isDisabled = useMemo(() => isSubmitting, [isSubmitting]);
+
+  async function sendViaApiFallback(name: string, email: string, message: string) {
+    const response = await fetch("/api/contact", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name,
+        email,
+        message,
+        website: honeypot,
+        formStartedAt,
+      }),
+    });
+
+    if (!response.ok) {
+      const data = (await response.json().catch(() => null)) as { error?: string } | null;
+      throw new Error(data?.error || "Failed to send message. Please try again.");
+    }
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    console.info("[contact] submit fired");
     setStatus(null);
 
     if (honeypot) {
+      console.warn("[contact] honeypot triggered, ignoring submission");
       return;
     }
 
@@ -38,35 +68,47 @@ export default function ContactForm() {
     const message = form.message.trim();
 
     if (!name || !email || !message) {
+      console.warn("[contact] blocked submit: empty required field");
       setStatus({ type: "error", message: "Name, email, and message are required." });
       return;
     }
 
     if (!emailPattern.test(email)) {
+      console.warn("[contact] blocked submit: invalid email", { email });
       setStatus({ type: "error", message: "Please enter a valid email address." });
       return;
     }
 
     setIsSubmitting(true);
+    console.info("[contact] submitting message", {
+      hasEmailJsConfig,
+      serviceConfigured: Boolean(EMAILJS_SERVICE_ID),
+      templateConfigured: Boolean(EMAILJS_TEMPLATE_ID),
+      keyConfigured: Boolean(EMAILJS_PUBLIC_KEY),
+    });
 
     try {
-      const response = await fetch("/api/contact", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          name,
-          email,
-          message,
-          website: honeypot,
-          formStartedAt,
-        }),
-      });
-
-      if (!response.ok) {
-        const data = (await response.json().catch(() => null)) as { error?: string } | null;
-        throw new Error(data?.error || "Failed to send message. Please try again.");
+      if (hasEmailJsConfig) {
+        await emailjs.send(
+          EMAILJS_SERVICE_ID,
+          EMAILJS_TEMPLATE_ID,
+          {
+            name,
+            email,
+            message,
+            from_name: name,
+            from_email: email,
+            reply_to: email,
+          },
+          {
+            publicKey: EMAILJS_PUBLIC_KEY,
+          },
+        );
+        console.info("[contact] email sent via EmailJS");
+      } else {
+        console.warn("[contact] EmailJS env missing, using API fallback");
+        await sendViaApiFallback(name, email, message);
+        console.info("[contact] email sent via API fallback");
       }
 
       setForm(initialForm);
@@ -74,15 +116,27 @@ export default function ContactForm() {
       setFormStartedAt(Date.now());
       setStatus({ type: "success", message: "Message sent successfully. I will get back to you soon." });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Failed to send message. Please try again.";
-      setStatus({ type: "error", message });
+      console.error("[contact] EmailJS failed, trying API fallback", error);
+
+      try {
+        await sendViaApiFallback(name, email, message);
+        console.info("[contact] email sent via API fallback after EmailJS failure");
+        setForm(initialForm);
+        setHoneypot("");
+        setFormStartedAt(Date.now());
+        setStatus({ type: "success", message: "Message sent successfully. I will get back to you soon." });
+      } catch (fallbackError) {
+        console.error("[contact] API fallback failed", fallbackError);
+        const message = fallbackError instanceof Error ? fallbackError.message : "Failed to send message. Please try again.";
+        setStatus({ type: "error", message });
+      }
     } finally {
       setIsSubmitting(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="section-shell rounded-2xl p-5" noValidate>
+    <form onSubmit={handleSubmit} className="section-shell relative z-30 rounded-2xl p-5 pointer-events-auto" noValidate>
       <div className="grid gap-4">
         <input
           type="text"
@@ -140,7 +194,7 @@ export default function ContactForm() {
           disabled={isDisabled}
           type="submit"
           aria-busy={isSubmitting}
-          className="inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-300/45 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-100 transition-all hover:bg-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-60"
+          className="relative z-30 inline-flex items-center justify-center gap-2 rounded-xl border border-cyan-300/45 bg-cyan-400/15 px-4 py-2 text-sm font-medium text-cyan-100 transition-all hover:bg-cyan-400/25 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
           {isSubmitting ? "Sending..." : "Send Message"}
