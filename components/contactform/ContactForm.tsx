@@ -21,37 +21,31 @@ const EMAILJS_PUBLIC_KEY = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY ?? "";
 export default function ContactForm() {
   const [form, setForm] = useState(initialForm);
   const [honeypot, setHoneypot] = useState("");
-  const [formStartedAt, setFormStartedAt] = useState<number>(() => Date.now());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<{ type: "success" | "error"; message: string } | null>(null);
 
-  const hasEmailJsConfig = useMemo(
-    () => Boolean(EMAILJS_SERVICE_ID && EMAILJS_TEMPLATE_ID && EMAILJS_PUBLIC_KEY),
-    [],
-  );
+  const missingConfig = useMemo(() => {
+    const missing: string[] = [];
 
-  const isDisabled = useMemo(() => isSubmitting, [isSubmitting]);
-
-  async function sendViaApiFallback(name: string, email: string, message: string) {
-    const response = await fetch("/api/contact", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name,
-        email,
-        message,
-        website: honeypot,
-        formStartedAt,
-      }),
-    });
-
-    if (!response.ok) {
-      const data = (await response.json().catch(() => null)) as { error?: string } | null;
-      throw new Error(data?.error || "Failed to send message. Please try again.");
+    if (!EMAILJS_SERVICE_ID) {
+      missing.push("NEXT_PUBLIC_EMAILJS_SERVICE_ID");
     }
-  }
+
+    if (!EMAILJS_TEMPLATE_ID) {
+      missing.push("NEXT_PUBLIC_EMAILJS_TEMPLATE_ID");
+    }
+
+    if (!EMAILJS_PUBLIC_KEY) {
+      missing.push("NEXT_PUBLIC_EMAILJS_PUBLIC_KEY");
+    }
+
+    return missing;
+  }, []);
+
+  const isDisabled = useMemo(
+    () => isSubmitting || !form.name.trim() || !form.email.trim() || !form.message.trim(),
+    [form.email, form.message, form.name, isSubmitting],
+  );
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -79,57 +73,48 @@ export default function ContactForm() {
       return;
     }
 
+    if (missingConfig.length > 0) {
+      const missingKeys = missingConfig.join(", ");
+      console.error("[contact] EmailJS env missing", { missing: missingConfig });
+      setStatus({
+        type: "error",
+        message: `Contact form is not configured. Missing: ${missingKeys}. Add these in Vercel Environment Variables and redeploy.`,
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     console.info("[contact] submitting message", {
-      hasEmailJsConfig,
       serviceConfigured: Boolean(EMAILJS_SERVICE_ID),
       templateConfigured: Boolean(EMAILJS_TEMPLATE_ID),
       keyConfigured: Boolean(EMAILJS_PUBLIC_KEY),
     });
 
     try {
-      if (hasEmailJsConfig) {
-        await emailjs.send(
-          EMAILJS_SERVICE_ID,
-          EMAILJS_TEMPLATE_ID,
-          {
-            name,
-            email,
-            message,
-            from_name: name,
-            from_email: email,
-            reply_to: email,
-          },
-          {
-            publicKey: EMAILJS_PUBLIC_KEY,
-          },
-        );
-        console.info("[contact] email sent via EmailJS");
-      } else {
-        console.warn("[contact] EmailJS env missing, using API fallback");
-        await sendViaApiFallback(name, email, message);
-        console.info("[contact] email sent via API fallback");
-      }
+      await emailjs.send(
+        EMAILJS_SERVICE_ID,
+        EMAILJS_TEMPLATE_ID,
+        {
+          name,
+          email,
+          message,
+          from_name: name,
+          from_email: email,
+          reply_to: email,
+        },
+        {
+          publicKey: EMAILJS_PUBLIC_KEY,
+        },
+      );
+      console.info("[contact] email sent via EmailJS");
 
       setForm(initialForm);
       setHoneypot("");
-      setFormStartedAt(Date.now());
       setStatus({ type: "success", message: "Message sent successfully. I will get back to you soon." });
     } catch (error) {
-      console.error("[contact] EmailJS failed, trying API fallback", error);
-
-      try {
-        await sendViaApiFallback(name, email, message);
-        console.info("[contact] email sent via API fallback after EmailJS failure");
-        setForm(initialForm);
-        setHoneypot("");
-        setFormStartedAt(Date.now());
-        setStatus({ type: "success", message: "Message sent successfully. I will get back to you soon." });
-      } catch (fallbackError) {
-        console.error("[contact] API fallback failed", fallbackError);
-        const message = fallbackError instanceof Error ? fallbackError.message : "Failed to send message. Please try again.";
-        setStatus({ type: "error", message });
-      }
+      console.error("[contact] EmailJS send failed", error);
+      const message = error instanceof Error ? error.message : "Failed to send message. Please try again.";
+      setStatus({ type: "error", message });
     } finally {
       setIsSubmitting(false);
     }
@@ -209,6 +194,12 @@ export default function ContactForm() {
         {status?.type === "error" ? (
           <p role="alert" className="rounded-lg border border-rose-300/20 bg-rose-400/10 px-3 py-2 text-sm text-rose-300">
             {status.message}
+          </p>
+        ) : null}
+
+        {missingConfig.length > 0 ? (
+          <p className="rounded-lg border border-amber-300/25 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
+            Missing EmailJS env in this deployment: {missingConfig.join(", ")}.
           </p>
         ) : null}
       </div>

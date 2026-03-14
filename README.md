@@ -36,12 +36,13 @@ Open `http://localhost:3000`.
 
 ## Email Setup (Contact Form)
 
-The contact form uses EmailJS from the frontend and falls back to `POST /api/contact` if EmailJS is unavailable or fails.
+The contact form uses EmailJS directly from the frontend.
 
-Backend delivery priority:
+Required variables for contact form sending:
 
-1. SMTP (`SMTP_*` variables)
-2. Resend fallback (`RESEND_API_KEY`)
+1. `NEXT_PUBLIC_EMAILJS_SERVICE_ID`
+2. `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID`
+3. `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`
 
 Configure these environment variables in `.env.local`:
 
@@ -50,22 +51,13 @@ NEXT_PUBLIC_SITE_URL=https://cybersyco.vercel.app
 NEXT_PUBLIC_EMAILJS_SERVICE_ID=service_xxxxxxx
 NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=template_xxxxxxx
 NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=xxxxxxxxxxxxxxxx
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-SMTP_SECURE=false
-SMTP_USER=your-smtp-user@example.com
-SMTP_PASS=your-smtp-password
-RESEND_API_KEY=re_xxxxxxxxxxxxxxxxxxxxx
-RESEND_FROM="Portfolio Contact <onboarding@resend.dev>"
-CONTACT_TO=tanmoymondaltanmoy94@gmail.com
-CONTACT_FROM="Portfolio Contact <your-smtp-user@example.com>"
 ```
 
 On successful form submit, users see:
 
 `Your message has been sent successfully.`
 
-### Step-by-Step Setup (Vercel + SMTP)
+### Step-by-Step Setup (Vercel + EmailJS)
 
 1. Open your Vercel project dashboard.
 2. Go to `Settings` -> `Environment Variables`.
@@ -73,53 +65,23 @@ On successful form submit, users see:
 	- `NEXT_PUBLIC_EMAILJS_SERVICE_ID`
 	- `NEXT_PUBLIC_EMAILJS_TEMPLATE_ID`
 	- `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`
-	- `SMTP_HOST`
-	- `SMTP_PORT`
-	- `SMTP_SECURE`
-	- `SMTP_USER`
-	- `SMTP_PASS`
-	- `CONTACT_TO`
-	- `CONTACT_FROM`
-	- `RESEND_API_KEY` (optional but recommended fallback)
-	- `RESEND_FROM` (optional sender for Resend)
-4. Add optional anti-spam controls:
-	- `CONTACT_RATE_LIMIT_WINDOW_MS` (example: `600000`)
-	- `CONTACT_RATE_LIMIT_MAX` (example: `5`)
-	- `CONTACT_MIN_FILL_MS` (example: `2500`)
-5. Redeploy the project from Vercel, or push a new commit.
-6. Submit a test message from `/contact`.
-7. Verify the message is received at `tanmoymondaltanmoy94@gmail.com`.
+4. Redeploy the project from Vercel, or push a new commit.
+5. Submit a test message from `/contact`.
+6. Verify the message is received.
 
-### Gmail SMTP Notes
+### EmailJS Security Notes
 
-If you use Gmail SMTP:
-
-1. Enable 2-Step Verification on your Google account.
-2. Create an App Password in Google Account security settings.
-3. Use that App Password as `SMTP_PASS`.
-4. Use:
-	- `SMTP_HOST=smtp.gmail.com`
-	- `SMTP_PORT=587`
-	- `SMTP_SECURE=false`
-
-### Contact API Protections
-
-The backend now includes:
-
-- Required-field validation for `name`, `email`, `message`
-- Email format validation
-- Message and name length validation
-- Honeypot field blocking (`website`)
-- Minimum form fill time check
-- Per-IP rate limiting with `429` responses for bursts
+1. Use EmailJS dashboard domain restrictions for your production domain.
+2. Keep private keys/server secrets out of client code.
+3. Use only the EmailJS Public Key in `NEXT_PUBLIC_EMAILJS_PUBLIC_KEY`.
 
 ### Frontend Form Behavior
 
 - Prevents default browser refresh on submit
 - Client-side validation for empty fields and email format
 - Loading state with disabled submit button while sending
-- Inline success/error alerts based on API response
-- Console logging for submit events and provider fallback diagnostics
+- Inline success/error alerts based on EmailJS response
+- Console logging for submit events and environment diagnostics
 
 ## Content Sources
 
